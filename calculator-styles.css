@@ -1,14 +1,24 @@
+/* max-width means there is minimum size the window can be squished to. Mobile friendly */
 .calculator-box{
-    width: 320px;
+    max-width: 320px;
     margin: 0 auto;
     text-align: center;
 }
 
-.display{
+/* the box sizing means I can write the same width as the calc box- border doesn't widen */
+.display-box{
     display: inline-block;
-    width: 316px;
+    width: 320px;
     height: 50px;
     border: solid 2px black; 
+     -webkit-box-sizing: border-box;
+     -moz-box-sizing: border-box;
+          box-sizing: border-box;
+}
+
+.output{
+    text-align: right;
+    font-size: 2.5rem;
 }
 
 .calculator-buttons{
