@@ -9,7 +9,7 @@
 <body>
     <div class="calculator-box">
         <div class="display-box">
-            <div data-current-value class="current-value"></div>
+            <div data-current-value class="current-value">0</div>
         </div>
 
         <div class="calculator-buttons"> <!--used data-operation for linking buttons to js, classes and tags stay styling only-->
@@ -23,7 +23,7 @@
             <button data-number>4</button>
             <button data-number>5</button>
             <button data-number>6</button>
-            <button data-operation>--</button>
+            <button data-operation>-</button>
             <button data-number>7</button>
             <button data-number>8</button>
             <button data-number>9</button>
@@ -50,11 +50,9 @@
 
     //clear display
     function clearAll(){
-        currentValue = '';
+        currentValue = '0';
         previousValue = '';
-        operation = undefined;
-        
-        updateDisplay();
+        operation = undefined;  
     }
 
     //update display
@@ -64,11 +62,15 @@
 
     //append number to current value
     function appendNumber(number){
+        if (currentValue.length === 1 && currentValue === '0'){
+            currentValue = '' + number.toString(); 
+            return;
+        }
         if (number === '.' && currentValue.includes('.')){
             return;
         }
-        currentValue = currentValue.toString() + number.toString();
-        updateDisplay();
+        
+        currentValue = currentValue.toString() + number.toString(); 
     }
 
     //delete last digit function
@@ -94,7 +96,7 @@
         else if (operation === '+'){
             result = prev + curr; 
         }
-        else if (operation === '--'){
+        else if (operation === '-'){
             result = prev - curr; 
 
         }
@@ -106,10 +108,20 @@
 
     //choose operation function
     function chooseOperation(operator){
-        if (currentValue === '' ){return;}//Can't click more than once
+        if (currentValue === ''){
+            if (operator === '-'){
+                appendNumber(operator);
+                updateDisplay();
+                return;
+            }
+            else {
+                return;
+            } 
+        }
         if (previousValue !== ''){
             compute();
         }
+
         operation = operator;
         previousValue = currentValue; 
         currentValue = '';
