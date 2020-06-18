@@ -9,7 +9,7 @@
 <body>
     <div class="calculator-box"> <!--everything for the calculator is in this container-->
         <div class="display-box"> <!--display screen container, will show current value variable-->
-            <div data-current-value class="current-value"></div>
+            <div data-current-value class="current-value">0</div>
         </div>
 
         <div class="calculator-buttons"> <!--used data-operation for linking buttons to js, classes and tags stay styling only-->
@@ -50,7 +50,7 @@
 
     //when we come into the calculator, each of the values are an empty string 
     //the operation is undefined.
-    let currentValue = '';
+    let currentValue = '0';
     let previousValue = '';
     let operation = undefined; 
 
@@ -75,6 +75,17 @@
      //append number to current value:
      //takes whatever was passed to it by a numButton click, param number
     function appendNumber(number){
+        //make sure that we cannot press 0 multiple times in a row
+        //and that we clear current value to blank rather than appending to 0
+        if(currentValue === '0'){
+            if (number === '0'){
+                return;
+            }
+            else{
+            currentValue = '';
+            }
+        }
+
         //if this argument is a decimal but our currentValue already includes one, don't go further into function- just return
         if (number === '.' && currentValue.includes('.')){
             return;
@@ -94,17 +105,32 @@
     //choose operation function
     //takes operator as innerText of operator button pushed, as operator param
     function chooseOperation(operator){
+        console.log("yes control to chooseOp");
+
         //this allows user to start the currentValue with a minus sign, 
-        //only come into this clause if currentValue is blank and the operator was a minus. Else, return  
-        if (currentValue === ''){
+        //only come into this clause if currentValue is blank and the operator selected was a minus. Else, return  
+        if (currentValue === '0' || currentValue === ''){//this is the problem that means I cannot select two ops in a row
             if (operator === '-'){
                 appendNumber(operator);
                 updateDisplay();
                 return;
             }
-            else {
-                return;
+            else if (operation !== undefined){
+                //if I already have an operator, two have been pressed in a row. Special case
+                //make the new operator the user has just selected the operator
+                //keep previousValue what is is
+                //keep currentValue blank
+                //Don't go further into the function or previousValue will be assigned the blank currentValue: no computation possible
+                operation = operator;
+                previousValue = previousValue; 
+                currentValue = '';
+                return;       
             } 
+        }
+        
+        //do not allow user attempts to keep pressing minus at the start of currentValue
+        if (currentValue === '-' && operator === '-'){
+            return;
         }
 
         //this allows immediate execution logic
@@ -160,7 +186,7 @@
 
     //clear display and all values
     function clearAll(){
-        currentValue = '';
+        currentValue = '0';
         previousValue = '';
         operation = undefined;  
     }
@@ -194,14 +220,14 @@
 
     deleteButton.addEventListener('click', () =>{
         //if you don't actually have anything for currentValue, just return instantly
-        if (currentValue.length < 1){return;}
+        if (currentValue.length < 1 || currentValue === '0'){return;}
         deleteLast();
         updateDisplay();
     });
 
     equalsButton.addEventListener('click', () =>{
         //if you don't have anything for currentValue, there is nothing on the right of the operation, so return 
-        if (currentValue.length < 1){return;}
+        if (currentValue.length < 1 || currentValue === '0'){return;}
         compute();
         updateDisplay();
     });
