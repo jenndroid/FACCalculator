@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jennifer's Calculator</title>
-    <link href="calculator-styles.css" rel="stylesheet">
+    <link href="calculator-styles.css" rel="stylesheet"> 
 </head>
 <body>
-    <div class="calculator-box">
-        <div class="display-box">
-            <div data-current-value class="current-value">0</div>
+    <div class="calculator-box"> <!--everything for the calculator is in this container-->
+        <div class="display-box"> <!--display screen container, will show current value variable-->
+            <div data-current-value class="current-value"></div>
         </div>
 
         <div class="calculator-buttons"> <!--used data-operation for linking buttons to js, classes and tags stay styling only-->
@@ -28,7 +28,7 @@
             <button data-number>8</button>
             <button data-number>9</button>
             <button data-operation>+</button>
-            <button data-number>.</button>
+            <button data-number>.</button> <!--decimal point is treated like part of a number in my functions-->
             <button data-number>0</button>
             <button data-equals class="long-button">=</button>
         </div>
@@ -36,57 +36,107 @@
 
 
 <script>
-    const numberButtons = document.querySelectorAll('[data-number]');
+    //connecting certain elements from the DOM to JS variables as un-reassignable consts
+    const numberButtons = document.querySelectorAll('[data-number]'); //everything assigned data-number is a numberButton variable
     const operationsButtons = document.querySelectorAll('[data-operation]');
     const equalsButton = document.querySelector('[data-equals]');
     const deleteButton = document.querySelector('[data-delete]');
     const allClearButton = document.querySelector('[data-all-clear]');
-    const currentValueTextElement = document.querySelector('[data-current-value]');
+    const currentValueTextElement = document.querySelector('[data-current-value]'); //this is the current value to be shown in display box
 
+    /*calculator is set up so that currentValue is to the right of the operator, or when there is no operator
+    and previousValue is to the left of the operator, when the operator is defined. 
+    */
+
+    //when we come into the calculator, each of the values are an empty string 
+    //the operation is undefined.
     let currentValue = '';
     let previousValue = '';
     let operation = undefined; 
 
 
-    //clear display
-    function clearAll(){
-        currentValue = '0';
-        previousValue = '';
-        operation = undefined;  
-    }
+    /*all functions declared straight away:
+    updateDisplay: displays whatever has been set as currentValue in the display box
+    appendNumber: concatenates single digits or a decimal point onto value
+    deleteLast: cuts off last digit/decimal of value
+    chooseOperation: allows user to define operation for sum, as well as start a value with a minus sign
+    compute: reads operation and does sum, setting result to currentValue to be displayed
+    clearAll: clears both values and sets operation to undefined again 
+    */
+
+    /*you can only ever work with currentValue. As soon as an operation selected, the value you were appending to 
+    becomes 'previousValue' and can no longer be mutated.*/
 
     //update display
     function updateDisplay(){
         currentValueTextElement.innerText = currentValue;
     }
 
-    //append number to current value
+     //append number to current value:
+     //takes whatever was passed to it by a numButton click, param number
     function appendNumber(number){
-        if (currentValue.length === 1 && currentValue === '0'){
-            currentValue = '' + number.toString(); 
-            return;
-        }
+        //if this argument is a decimal but our currentValue already includes one, don't go further into function- just return
         if (number === '.' && currentValue.includes('.')){
             return;
         }
-        
+
+        //otherwise, what is selected is changed to string type, then concatenated to whatever is already in currentValue
+        //POSSIBLE CHANGE: why not just have currentValue += number.toString? Surely we are changing to string type twice here? 
         currentValue = currentValue.toString() + number.toString(); 
     }
 
     //delete last digit function
     function deleteLast(){
+        //uses slice to return the first to n-1 digits of whatever is presently inside currentValue
         currentValue = currentValue.slice(0, currentValue.length-1);
-        updateDisplay();
+    }
+
+    //choose operation function
+    //takes operator as innerText of operator button pushed, as operator param
+    function chooseOperation(operator){
+        //this allows user to start the currentValue with a minus sign, 
+        //only come into this clause if currentValue is blank and the operator was a minus. Else, return  
+        if (currentValue === ''){
+            if (operator === '-'){
+                appendNumber(operator);
+                updateDisplay();
+                return;
+            }
+            else {
+                return;
+            } 
+        }
+
+        //this allows immediate execution logic
+        //As soon as we have one thing either side of an operation, perform sum
+        //the result of the computation will become currentValue, but the innerText is not updated so you won't see that. 
+        //3 x 5 becomes result and then currentValue of 15. previousValue is then cleard
+        //so when you subsequently press x 3 that 15 moves over to previousValue and pressing equals will result in 45.
+        if (previousValue !== ''){
+            compute();
+        }
+
+        //pass the operator innerText to the operation variable
+        //send the value we were just appending to over to the left side of this operation, as previousValue
+        //clear currentValue, ready to be built up 
+        operation = operator;
+        previousValue = currentValue; 
+        currentValue = '';
     }
 
     //compute function
     function compute(){
-        let result = '';
-        let prev = parseFloat(previousValue); //I could just parse the things as floats in line below
-        let curr = parseFloat(currentValue);
         
+        let result = '';
+        
+        //POSSIBLE CHANGE: could just parse previousValue and currentValue as floats inline rather than declaring prev and curr
+        //make sure the parseFloat function has worked: catch any mistakes here and return instantly
+        //POSSIBLE CHANGE: return with an error statement saying that something was not a number for usability!
+        let prev = parseFloat(previousValue); 
+        let curr = parseFloat(currentValue);
         if (isNaN(prev) || isNaN(curr)){return;}
 
+        //perform sum and assign result accordingly
         if (operation === '÷'){
             result = prev / curr; 
         }
@@ -98,35 +148,29 @@
         }
         else if (operation === '-'){
             result = prev - curr; 
-
         }
-        
-    currentValue = result; 
-    previousValue = '';
-    operation = undefined; 
+
+        //result is sent to currentValue so updateDisplay will show it
+        //previousValue is cleared so that setting an operation will allow immediate execution
+        //operation cleared to undefined
+        currentValue = result; 
+        previousValue = '';
+        operation = undefined; 
     }
 
-    //choose operation function
-    function chooseOperation(operator){
-        if (currentValue === ''){
-            if (operator === '-'){
-                appendNumber(operator);
-                updateDisplay();
-                return;
-            }
-            else {
-                return;
-            } 
-        }
-        if (previousValue !== ''){
-            compute();
-        }
-
-        operation = operator;
-        previousValue = currentValue; 
+    //clear display and all values
+    function clearAll(){
         currentValue = '';
+        previousValue = '';
+        operation = undefined;  
     }
 
+
+    /*connecting buttons to functions*/
+
+    //jumps over everything designated a number button with for each
+    //adds an event listener: on click, send the button's innerText to the appendNumber func, 
+    //then come back here and update the display
     numberButtons.forEach(button => {
         button.addEventListener('click', () => {
             appendNumber(button.innerText);
@@ -134,7 +178,9 @@
         })
     });
 
+
     operationsButtons.forEach(button => {
+        //POSSIBLE FIX: since we are not appending the operation to the string, let's hightlight button pressed for usability
         button.addEventListener('click', () => {
             chooseOperation(button.innerText);
             updateDisplay();
@@ -147,16 +193,18 @@
     });
 
     deleteButton.addEventListener('click', () =>{
-    if (currentValue.length < 1){return;}
+        //if you don't actually have anything for currentValue, just return instantly
+        if (currentValue.length < 1){return;}
         deleteLast();
-    });
-
-    equalsButton.addEventListener('click', () =>{
-    if (currentValue.length < 1){return;}
-        compute();
         updateDisplay();
     });
 
+    equalsButton.addEventListener('click', () =>{
+        //if you don't have anything for currentValue, there is nothing on the right of the operation, so return 
+        if (currentValue.length < 1){return;}
+        compute();
+        updateDisplay();
+    });
 
 </script>
 
