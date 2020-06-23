@@ -10,8 +10,6 @@
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
-    font-family: Cal; /*idk why this only changes the font of the display box*/
-
     -webkit-touch-callout: none; /*Make user unable to highlight or drag anything on my calc*/
     -webkit-user-select: none; 
      -khtml-user-select: none; 
@@ -30,6 +28,7 @@
      -webkit-box-sizing: border-box;
      -moz-box-sizing: border-box;
           box-sizing: border-box;
+    font-family: Cal;
     overflow: scroll;
 }
 
@@ -43,6 +42,10 @@
     justify-content: center;
     grid-template-rows: repeat(5, 50px);
     grid-template-columns: repeat(4, 80px);
+}
+
+.opButton:focus{
+    background-color: #edbeca;
 }
 
 .long-button{

@@ -15,22 +15,22 @@
         <div class="calculator-buttons"> <!--used data-operation for linking buttons to js, classes and tags stay styling only-->
             <button data-all-clear class="long-button">AC</button>
             <button data-delete>DEL</button>
-            <button data-operation>÷</button>
+            <button class="opButton" data-operation>÷</button>
             <button data-number>1</button>
             <button data-number>2</button>
             <button data-number>3</button>
-            <button data-operation>x</button>
+            <button class="opButton" data-operation>x</button>
             <button data-number>4</button>
             <button data-number>5</button>
             <button data-number>6</button>
-            <button data-operation>-</button>
+            <button class="opButton" data-operation>-</button>
             <button data-number>7</button>
             <button data-number>8</button>
             <button data-number>9</button>
-            <button data-operation>+</button>
+            <button class="opButton" data-operation>+</button>
             <button data-number>.</button> <!--decimal point is treated like part of a number in my functions-->
             <button data-number>0</button>
-            <button data-equals class="long-button">=</button>
+            <button class="long-button" data-equals >=</button>
         </div>
     </div>
 
@@ -119,21 +119,6 @@
     //choose operation function
     //takes operator as innerText of operator button pushed, as operator param
     function chooseOperation(operator){
-        /*
-        if (currentValue === '0' || currentValue === '' && operator === '-'){
-            appendNumber(operator);
-            updateDisplay();
-            return;
-        }
-
-        if (currentValue === '' && operation !== undefined){
-            operation = operator;
-            previousValue = previousValue; 
-            return; 
-        }
-
-        */
-
         //this allows user to start the currentValue with a minus sign, 
         //only come into this clause if currentValue is blank and the operator selected was a minus. Else, return  
         if (currentValue === '0' || currentValue === ''){//this is the problem that means I cannot select two ops in a row
@@ -250,7 +235,6 @@
 
 
     operationsButtons.forEach(button => {
-        //POSSIBLE FIX: since we are not appending the operation to the string, let's hightlight button pressed for usability
         button.addEventListener('click', () => {
             chooseOperation(button.innerText);
         })
