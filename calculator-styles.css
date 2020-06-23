@@ -1,8 +1,16 @@
+@font-face{
+    src: url(Calculator.ttf);
+    font-family: Cal;
+}
+
 /* max-width means there is minimum size the window can be squished to. Mobile friendly */
 .calculator-box{
     max-width: 320px;
-    margin: 0 auto;
-    text-align: center;
+    position: absolute; 
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    font-family: Cal; /*idk why this only changes the font of the display box*/
 
     -webkit-touch-callout: none; /*Make user unable to highlight or drag anything on my calc*/
     -webkit-user-select: none; 
@@ -22,6 +30,7 @@
      -webkit-box-sizing: border-box;
      -moz-box-sizing: border-box;
           box-sizing: border-box;
+    overflow: scroll;
 }
 
 .current-value{

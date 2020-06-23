@@ -53,6 +53,7 @@
     let currentValue = '0';
     let previousValue = '';
     let operation = undefined; 
+    let computed = false;
 
 
     /*all functions declared straight away:
@@ -77,6 +78,8 @@
     function appendNumber(number){
         //make sure that we cannot press 0 multiple times in a row
         //and that we clear current value to blank rather than appending to 0
+        /*
+
         if(currentValue === '0'){
             if (number === '0'){
                 return;
@@ -85,27 +88,51 @@
             currentValue = '';
             }
         }
+        */
+        if (currentValue.length == 8){return;}
+        if (currentValue === '0' && number === '0') {return;}
+        if (currentValue === '0' && number !== '0') {currentValue = '';}
+        //this means numbers cannot be appended to a result. Instead, a blank string will start
+        if (computed == true){
+            currentValue = '';
+            computed = false;
+        }
+        
 
         //if this argument is a decimal but our currentValue already includes one, don't go further into function- just return
-        if (number === '.' && currentValue.includes('.')){
-            return;
-        }
+        if (number === '.' && currentValue.includes('.')){return;}
 
         //otherwise, what is selected is changed to string type, then concatenated to whatever is already in currentValue
         //POSSIBLE CHANGE: why not just have currentValue += number.toString? Surely we are changing to string type twice here? 
         currentValue = currentValue.toString() + number.toString(); 
+
+        updateDisplay();
     }
 
     //delete last digit function
     function deleteLast(){
         //uses slice to return the first to n-1 digits of whatever is presently inside currentValue
         currentValue = currentValue.slice(0, currentValue.length-1);
+        updateDisplay();
     }
 
     //choose operation function
     //takes operator as innerText of operator button pushed, as operator param
     function chooseOperation(operator){
-        console.log("yes control to chooseOp");
+        /*
+        if (currentValue === '0' || currentValue === '' && operator === '-'){
+            appendNumber(operator);
+            updateDisplay();
+            return;
+        }
+
+        if (currentValue === '' && operation !== undefined){
+            operation = operator;
+            previousValue = previousValue; 
+            return; 
+        }
+
+        */
 
         //this allows user to start the currentValue with a minus sign, 
         //only come into this clause if currentValue is blank and the operator selected was a minus. Else, return  
@@ -119,11 +146,10 @@
                 //if I already have an operator, two have been pressed in a row. Special case
                 //make the new operator the user has just selected the operator
                 //keep previousValue what is is
-                //keep currentValue blank
+                //currentValue will remain blank, as it was when we came into clause
                 //Don't go further into the function or previousValue will be assigned the blank currentValue: no computation possible
                 operation = operator;
                 previousValue = previousValue; 
-                currentValue = '';
                 return;       
             } 
         }
@@ -148,10 +174,22 @@
         operation = operator;
         previousValue = currentValue; 
         currentValue = '';
+
+        updateDisplay();
     }
 
     //compute function
     function compute(){
+        //dividing by 0 produces an error
+        if (operation == '÷' && currentValue == '0'){
+            currentValue = "undefined";
+            updateDisplay();
+            currentValue = '';
+            previousValue = '';
+            operation = undefined;
+            computed = true;
+            return;
+        }
         
         let result = '';
         
@@ -177,18 +215,25 @@
         }
 
         //result is sent to currentValue so updateDisplay will show it
+        //decimal numbers are cut off by js after 16 decimal places
+        //scrollbar will appear on display hover for long ints
         //previousValue is cleared so that setting an operation will allow immediate execution
         //operation cleared to undefined
-        currentValue = result; 
+        
+        currentValue = result;
         previousValue = '';
         operation = undefined; 
+        computed = true;
+
+        updateDisplay();
     }
 
     //clear display and all values
     function clearAll(){
         currentValue = '0';
         previousValue = '';
-        operation = undefined;  
+        operation = undefined; 
+        updateDisplay(); 
     }
 
 
@@ -200,7 +245,6 @@
     numberButtons.forEach(button => {
         button.addEventListener('click', () => {
             appendNumber(button.innerText);
-            updateDisplay();
         })
     });
 
@@ -209,27 +253,23 @@
         //POSSIBLE FIX: since we are not appending the operation to the string, let's hightlight button pressed for usability
         button.addEventListener('click', () => {
             chooseOperation(button.innerText);
-            updateDisplay();
         })
     });
 
     allClearButton.addEventListener('click', () =>{
         clearAll();
-        updateDisplay();
     });
 
     deleteButton.addEventListener('click', () =>{
         //if you don't actually have anything for currentValue, just return instantly
         if (currentValue.length < 1 || currentValue === '0'){return;}
         deleteLast();
-        updateDisplay();
     });
 
     equalsButton.addEventListener('click', () =>{
         //if you don't have anything for currentValue, there is nothing on the right of the operation, so return 
-        if (currentValue.length < 1 || currentValue === '0'){return;}
+        if (currentValue.length < 1){return;}
         compute();
-        updateDisplay();
     });
 
 </script>
