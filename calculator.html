@@ -7,6 +7,7 @@
     <link href="calculator-styles.css" rel="stylesheet"> 
 </head>
 <body>
+    <span id="hidden-message">press e for equals :)</span>
     <div class="calculator-box"> <!--everything for the calculator is in this container-->
         <div id="display"> <!--display screen container, will show current value variable-->
             <div data-current-value class="current-value">0</div>
@@ -227,6 +228,7 @@
     operationsButtons.forEach(button => {
         button.addEventListener('click', () => {
             chooseOperation(button.innerText);
+            document.getElementsByClassName("opButton").classList.toggle("active");
         })
     });
 
@@ -249,12 +251,16 @@
 
     //I don't know why only this format for a keydown event works!!
     document.addEventListener("keydown", function(event){
-        if(event.keyCode == 13){ //enter to compute. This only works the first time after a refresh! After that, 0
+        //enter to compute. This only works the first time after a refresh! After that, compute is 0
+        //also, if I press it when there is no previous it will bring display back to 0
+        //...it's something to do with the enter key in particular. Pressing 'e', 69, works ok
+        if(event.keyCode == 69){ 
             if (currentValue.length < 1){return;}
             compute();
         }
 
-        if(event.keyCode == 56 && event.shiftKey){ //if an asterisk is pressed with key 8, muliply
+        if(event.keyCode == 56 && event.shiftKey){ //if an asterisk is pressed with key 8, muliply & flash colour
+            document.getElementById("multiply").classList.add("active");
             chooseOperation('x');
         }
         else if (event.keyCode >= 48 && event.keyCode <= 57){//if any number keys are pressed
@@ -262,17 +268,39 @@
             appendNumber(event.key);
         }
         else if(event.keyCode == 8){//delete last
+            if (computed == true){//pressing delete after a computation will clear result 
+                clearAll();
+                return;
+            }
             deleteLast();
         }
         //functionality for operation buttons
-        else if(event.keyCode == 191){ //divide
+        else if(event.keyCode == 191){ //divide is called and flashes pink
+            document.getElementById("divide").classList.add("active");
             chooseOperation('÷');
         }
         else if(event.keyCode == 189){ //subtract
+            document.getElementById("subtract").classList.add("active");
             chooseOperation('-');
         }
         else if(event.keyCode == 187 && event.shiftKey){ //add
+            document.getElementById("add").classList.add("active");
             chooseOperation('+');
+        }
+    });
+
+    document.addEventListener("keyup", function(event){
+        if(event.keyCode == 56 && event.shiftKey){ //button goes back grey on key up
+            document.getElementById("multiply").classList.toggle("active");
+        }
+        if(event.keyCode == 191){ 
+            document.getElementById("divide").classList.toggle("active");
+        }
+        if(event.keyCode == 189){ 
+            document.getElementById("subtract").classList.toggle("active");
+        }
+        if(event.keyCode == 187 && event.shiftKey){
+            document.getElementById("add").classList.toggle("active");
         }
     });
 
