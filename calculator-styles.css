@@ -20,7 +20,7 @@
 }
 
 /* the box sizing means I can write the same width as the calc box- border doesn't widen */
-.display-box{
+#display{
     display: inline-block;
     width: 320px;
     height: 50px;

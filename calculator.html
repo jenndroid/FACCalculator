@@ -8,29 +8,29 @@
 </head>
 <body>
     <div class="calculator-box"> <!--everything for the calculator is in this container-->
-        <div class="display-box"> <!--display screen container, will show current value variable-->
+        <div id="display"> <!--display screen container, will show current value variable-->
             <div data-current-value class="current-value">0</div>
         </div>
 
         <div class="calculator-buttons"> <!--used data-operation for linking buttons to js, classes and tags stay styling only-->
-            <button data-all-clear class="long-button">AC</button>
-            <button data-delete>DEL</button>
-            <button class="opButton" data-operation>÷</button>
-            <button data-number>1</button>
-            <button data-number>2</button>
-            <button data-number>3</button>
-            <button class="opButton" data-operation>x</button>
-            <button data-number>4</button>
-            <button data-number>5</button>
-            <button data-number>6</button>
-            <button class="opButton" data-operation>-</button>
-            <button data-number>7</button>
-            <button data-number>8</button>
-            <button data-number>9</button>
-            <button class="opButton" data-operation>+</button>
-            <button data-number>.</button> <!--decimal point is treated like part of a number in my functions-->
-            <button data-number>0</button>
-            <button class="long-button" data-equals >=</button>
+            <button class="long-button" id="clear" data-all-clear >AC</button>
+            <button id="delete" data-delete>DEL</button>
+            <button class="opButton" id="divide" data-operation>÷</button>
+            <button id="one" data-number>1</button>
+            <button id="two" data-number>2</button>
+            <button id="three" data-number>3</button>
+            <button class="opButton" id="multiply" data-operation>x</button>
+            <button id="four" data-number>4</button>
+            <button id="five" data-number>5</button>
+            <button id="six" data-number>6</button>
+            <button class="opButton" id="subtract" data-operation>-</button>
+            <button id="seven" data-number>7</button>
+            <button id="eight" data-number>8</button>
+            <button id="nine" data-number>9</button>
+            <button class="opButton" id="add" data-operation>+</button>
+            <button id="decimal" data-number>.</button> <!--decimal point is treated like part of a number in my functions-->
+            <button id="zero" data-number>0</button>
+            <button class="long-button" id="equals" data-equals >=</button>
         </div>
     </div>
 
@@ -78,17 +78,6 @@
     function appendNumber(number){
         //make sure that we cannot press 0 multiple times in a row
         //and that we clear current value to blank rather than appending to 0
-        /*
-
-        if(currentValue === '0'){
-            if (number === '0'){
-                return;
-            }
-            else{
-            currentValue = '';
-            }
-        }
-        */
         if (currentValue.length == 8){return;}
         if (currentValue === '0' && number === '0') {return;}
         if (currentValue === '0' && number !== '0') {currentValue = '';}
@@ -112,6 +101,7 @@
     //delete last digit function
     function deleteLast(){
         //uses slice to return the first to n-1 digits of whatever is presently inside currentValue
+        if (currentValue === '0'){return;}
         currentValue = currentValue.slice(0, currentValue.length-1);
         updateDisplay();
     }
@@ -254,6 +244,36 @@
         //if you don't have anything for currentValue, there is nothing on the right of the operation, so return 
         if (currentValue.length < 1){return;}
         compute();
+    });
+
+
+    //I don't know why only this format for a keydown event works!!
+    document.addEventListener("keydown", function(event){
+        if(event.keyCode == 13){ //enter to compute. This only works the first time after a refresh! After that, 0
+            if (currentValue.length < 1){return;}
+            compute();
+        }
+
+        if(event.keyCode == 56 && event.shiftKey){ //if an asterisk is pressed with key 8, muliply
+            chooseOperation('x');
+        }
+        else if (event.keyCode >= 48 && event.keyCode <= 57){//if any number keys are pressed
+            if (isNaN(event.key)){return;}
+            appendNumber(event.key);
+        }
+        else if(event.keyCode == 8){//delete last
+            deleteLast();
+        }
+        //functionality for operation buttons
+        else if(event.keyCode == 191){ //divide
+            chooseOperation('÷');
+        }
+        else if(event.keyCode == 189){ //subtract
+            chooseOperation('-');
+        }
+        else if(event.keyCode == 187 && event.shiftKey){ //add
+            chooseOperation('+');
+        }
     });
 
 </script>
