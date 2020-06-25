@@ -7,13 +7,12 @@
     <link href="calculator-styles.css" rel="stylesheet"> 
 </head>
 <body>
-    <span id="hidden-message">press e for equals :)</span>
-    <div class="calculator-box"> <!--everything for the calculator is in this container-->
-        <div id="display"> <!--display screen container, will show current value variable-->
-            <div data-current-value class="current-value">0</div>
-        </div>
-
-        <div class="calculator-buttons"> <!--used data-operation for linking buttons to js, classes and tags stay styling only-->
+    <span id="hidden-message">press enter for equals :)</span>
+    <main class="calculator-box"> <!--everything for the calculator is in this container-->
+        <section id="display"> <!--display screen container, will show current value variable-->
+            <section data-current-value class="current-value">0</section>
+        </section>
+        <section class="calculator-buttons"> <!--used data-operation for linking buttons to js, classes and tags stay styling only-->
             <button class="long-button" id="clear" data-all-clear >AC</button>
             <button id="delete" data-delete>DEL</button>
             <button class="opButton" id="divide" data-operation>÷</button>
@@ -32,8 +31,8 @@
             <button id="decimal" data-number>.</button> <!--decimal point is treated like part of a number in my functions-->
             <button id="zero" data-number>0</button>
             <button class="long-button" id="equals" data-equals >=</button>
-        </div>
-    </div>
+        </section>
+    </main>
 
 
 <script>
@@ -251,10 +250,7 @@
 
     //I don't know why only this format for a keydown event works!!
     document.addEventListener("keydown", function(event){
-        //enter to compute. This only works the first time after a refresh! After that, compute is 0
-        //also, if I press it when there is no previous it will bring display back to 0
-        //...it's something to do with the enter key in particular. Pressing 'e', 69, works ok
-        if(event.keyCode == 69){ 
+        if(event.keyCode == 13){ 
             if (currentValue.length < 1){return;}
             compute();
         }
