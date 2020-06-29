@@ -7,12 +7,11 @@
     <link href="calculator-styles.css" rel="stylesheet"> 
 </head>
 <body>
-    <span id="hidden-message">press enter for equals :)</span>
-    <main class="calculator-box"> <!--everything for the calculator is in this container-->
-        <section id="display"> <!--display screen container, will show current value variable-->
+    <main class="calculator-box">
+        <section id="display">
             <section data-current-value class="current-value">0</section>
         </section>
-        <section class="calculator-buttons"> <!--used data-operation for linking buttons to js, classes and tags stay styling only-->
+        <section class="calculator-buttons">
             <button class="long-button" id="clear" data-all-clear >AC</button>
             <button id="delete" data-delete>DEL</button>
             <button class="opButton" id="divide" data-operation>÷</button>
@@ -28,7 +27,7 @@
             <button id="eight" data-number>8</button>
             <button id="nine" data-number>9</button>
             <button class="opButton" id="add" data-operation>+</button>
-            <button id="decimal" data-number>.</button> <!--decimal point is treated like part of a number in my functions-->
+            <button id="decimal" data-number>.</button> <!--decimal point is treated like part of a number in functions-->
             <button id="zero" data-number>0</button>
             <button class="long-button" id="equals" data-equals >=</button>
         </section>
@@ -44,19 +43,19 @@
     const allClearButton = document.querySelector('[data-all-clear]');
     const currentValueTextElement = document.querySelector('[data-current-value]'); //this is the current value to be shown in display box
 
-    /*calculator is set up so that currentValue is to the right of the operator, or when there is no operator
+    /*calculator is set up so that currentValue is to the right of the operator, or is the only value when there is no operator
     and previousValue is to the left of the operator, when the operator is defined. 
     */
 
-    //when we come into the calculator, each of the values are an empty string 
-    //the operation is undefined.
+    //when we come into the calculator, each of the values are an empty string & operation is undefined
+    //computed is a variable that we can turn on and off to prevent appending to results
     let currentValue = '0';
     let previousValue = '';
     let operation = undefined; 
     let computed = false;
 
 
-    /*all functions declared straight away:
+    /* all functions declared straight away:
     updateDisplay: displays whatever has been set as currentValue in the display box
     appendNumber: concatenates single digits or a decimal point onto value
     deleteLast: cuts off last digit/decimal of value
@@ -65,32 +64,28 @@
     clearAll: clears both values and sets operation to undefined again 
     */
 
-    /*you can only ever work with currentValue. As soon as an operation selected, the value you were appending to 
-    becomes 'previousValue' and can no longer be mutated.*/
+    /* you can only ever work with currentValue. As soon as an operation selected, the value you were appending to 
+    becomes 'previousValue' and can no longer be mutated. */
 
-    //update display
+    /* update display */
     function updateDisplay(){
         currentValueTextElement.innerText = currentValue;
     }
 
-     //append number to current value:
-     //takes whatever was passed to it by a numButton click, param number
+     /* append number to current value:
+     takes whatever was passed to it by a numButton click, param number */
     function appendNumber(number){
-        //make sure that we cannot press 0 multiple times in a row
-        //and that we clear current value to blank rather than appending to 0
-        if (currentValue.length == 8){return;}
-        if (currentValue === '0' && number === '0') {return;}
-        if (currentValue === '0' && number !== '0') {currentValue = '';}
+        if (currentValue.length == 8){return;} //calculator will only accept 8-figure numbers
+        if (currentValue === '0' && number === '0') {return;} //make sure that we cannot press 0 multiple times in a row
+        if (currentValue === '0' && number !== '0') {currentValue = '';}//after an allClear/refresh, clear default 0 before appending
+        if (number === '.' && currentValue.includes('.')){return;} //only accept one decimal point in currentValue
+
         //this means numbers cannot be appended to a result. Instead, a blank string will start
         if (computed == true){
             currentValue = '';
             computed = false;
         }
         
-
-        //if this argument is a decimal but our currentValue already includes one, don't go further into function- just return
-        if (number === '.' && currentValue.includes('.')){return;}
-
         //otherwise, what is selected is changed to string type, then concatenated to whatever is already in currentValue
         //POSSIBLE CHANGE: why not just have currentValue += number.toString? Surely we are changing to string type twice here? 
         currentValue = currentValue.toString() + number.toString(); 
@@ -98,31 +93,22 @@
         updateDisplay();
     }
 
-    //delete last digit function
+    /* delete last digit */
     function deleteLast(){
-        //uses slice to return the first to n-1 digits of whatever is presently inside currentValue
         if (currentValue === '0'){return;}
         currentValue = currentValue.slice(0, currentValue.length-1);
         updateDisplay();
     }
 
-    //choose operation function
-    //takes operator as innerText of operator button pushed, as operator param
+    /* choose operation function */
     function chooseOperation(operator){
-        //this allows user to start the currentValue with a minus sign, 
-        //only come into this clause if currentValue is blank and the operator selected was a minus. Else, return  
-        if (currentValue === '0' || currentValue === ''){//this is the problem that means I cannot select two ops in a row
+        if (currentValue === '0' || currentValue === ''){//this allows user to start the currentValue with a minus sign
             if (operator === '-'){
                 appendNumber(operator);
                 updateDisplay();
                 return;
             }
-            else if (operation !== undefined){
-                //if I already have an operator, two have been pressed in a row. Special case
-                //make the new operator the user has just selected the operator
-                //keep previousValue what is is
-                //currentValue will remain blank, as it was when we came into clause
-                //Don't go further into the function or previousValue will be assigned the blank currentValue: no computation possible
+            else if (operation !== undefined){//if I already have an operator, two have been pressed in a row. Special case
                 operation = operator;
                 previousValue = previousValue; 
                 return;       
@@ -130,22 +116,13 @@
         }
         
         //do not allow user attempts to keep pressing minus at the start of currentValue
-        if (currentValue === '-' && operator === '-'){
-            return;
-        }
+        if (currentValue === '-' && operator === '-'){return;}
 
         //this allows immediate execution logic
-        //As soon as we have one thing either side of an operation, perform sum
-        //the result of the computation will become currentValue, but the innerText is not updated so you won't see that. 
-        //3 x 5 becomes result and then currentValue of 15. previousValue is then cleard
-        //so when you subsequently press x 3 that 15 moves over to previousValue and pressing equals will result in 45.
         if (previousValue !== ''){
             compute();
         }
 
-        //pass the operator innerText to the operation variable
-        //send the value we were just appending to over to the left side of this operation, as previousValue
-        //clear currentValue, ready to be built up 
         operation = operator;
         previousValue = currentValue; 
         currentValue = '';
@@ -153,8 +130,23 @@
         updateDisplay();
     }
 
-    //compute function
+    /* compute function */
     function compute(){
+        switch(operation){
+            case '÷':
+                document.getElementById("divide").classList.remove("active");
+                break;
+            case 'x':
+                document.getElementById("multiply").classList.remove("active");
+                break;
+            case '+':
+                document.getElementById("add").classList.remove("active");
+                break;
+            case '-':
+                document.getElementById("subtract").classList.remove("active");
+                break;
+        }
+
         //dividing by 0 produces an error
         if (operation == '÷' && currentValue == '0'){
             currentValue = "undefined";
@@ -169,32 +161,27 @@
         let result = '';
         
         //POSSIBLE CHANGE: could just parse previousValue and currentValue as floats inline rather than declaring prev and curr
-        //make sure the parseFloat function has worked: catch any mistakes here and return instantly
         //POSSIBLE CHANGE: return with an error statement saying that something was not a number for usability!
         let prev = parseFloat(previousValue); 
         let curr = parseFloat(currentValue);
         if (isNaN(prev) || isNaN(curr)){return;}
 
         //perform sum and assign result accordingly
-        if (operation === '÷'){
-            result = prev / curr; 
-        }
-        else if (operation === 'x'){
-            result = prev * curr; 
-        }
-        else if (operation === '+'){
-            result = prev + curr; 
-        }
-        else if (operation === '-'){
-            result = prev - curr; 
+        switch(operation){
+            case '÷':
+                result = prev / curr;
+                break;
+            case 'x':
+                result = prev * curr;
+                break;
+            case '+':
+                result = prev + curr;
+                break;
+            case '-':
+                result = prev - curr;
+                break;
         }
 
-        //result is sent to currentValue so updateDisplay will show it
-        //decimal numbers are cut off by js after 16 decimal places
-        //scrollbar will appear on display hover for long ints
-        //previousValue is cleared so that setting an operation will allow immediate execution
-        //operation cleared to undefined
-        
         currentValue = result;
         previousValue = '';
         operation = undefined; 
@@ -203,7 +190,7 @@
         updateDisplay();
     }
 
-    //clear display and all values
+    /* clear display and all values */
     function clearAll(){
         currentValue = '0';
         previousValue = '';
@@ -212,22 +199,16 @@
     }
 
 
-    /*connecting buttons to functions*/
-
-    //jumps over everything designated a number button with for each
-    //adds an event listener: on click, send the button's innerText to the appendNumber func, 
-    //then come back here and update the display
+    /* connecting buttons to functions */
     numberButtons.forEach(button => {
         button.addEventListener('click', () => {
             appendNumber(button.innerText);
         })
     });
 
-
     operationsButtons.forEach(button => {
         button.addEventListener('click', () => {
             chooseOperation(button.innerText);
-            document.getElementsByClassName("opButton").classList.toggle("active");
         })
     });
 
@@ -248,55 +229,70 @@
     });
 
 
-    //I don't know why only this format for a keydown event works!!
-    document.addEventListener("keydown", function(event){
-        if(event.keyCode == 13){ 
-            if (currentValue.length < 1){return;}
-            compute();
-        }
-
-        if(event.keyCode == 56 && event.shiftKey){ //if an asterisk is pressed with key 8, muliply & flash colour
-            document.getElementById("multiply").classList.add("active");
-            chooseOperation('x');
-        }
-        else if (event.keyCode >= 48 && event.keyCode <= 57){//if any number keys are pressed
-            if (isNaN(event.key)){return;}
-            appendNumber(event.key);
-        }
-        else if(event.keyCode == 8){//delete last
-            if (computed == true){//pressing delete after a computation will clear result 
-                clearAll();
-                return;
-            }
-            deleteLast();
-        }
-        //functionality for operation buttons
-        else if(event.keyCode == 191){ //divide is called and flashes pink
-            document.getElementById("divide").classList.add("active");
-            chooseOperation('÷');
-        }
-        else if(event.keyCode == 189){ //subtract
-            document.getElementById("subtract").classList.add("active");
-            chooseOperation('-');
-        }
-        else if(event.keyCode == 187 && event.shiftKey){ //add
-            document.getElementById("add").classList.add("active");
-            chooseOperation('+');
-        }
-    });
-
-    document.addEventListener("keyup", function(event){
-        if(event.keyCode == 56 && event.shiftKey){ //button goes back grey on key up
-            document.getElementById("multiply").classList.toggle("active");
-        }
-        if(event.keyCode == 191){ 
-            document.getElementById("divide").classList.toggle("active");
-        }
-        if(event.keyCode == 189){ 
-            document.getElementById("subtract").classList.toggle("active");
-        }
-        if(event.keyCode == 187 && event.shiftKey){
-            document.getElementById("add").classList.toggle("active");
+    /* keybindings */
+    document.addEventListener("keydown", function(event){  
+       switch(event.key){
+           case 'Enter': //enter key default overidden & can't compute without two operands
+                event.preventDefault();
+                if (currentValue.length < 1){return;}
+                compute();
+                break;
+            case '*': //all operator buttons will light up & call respective operation
+                document.getElementById("multiply").classList.add("active");
+                chooseOperation('x');
+                break;
+            case '/':
+                document.getElementById("divide").classList.add("active");
+                chooseOperation('÷');
+                break;
+            case '-':
+                document.getElementById("subtract").classList.add("active");
+                chooseOperation('-');
+                break;
+            case '+':
+                document.getElementById("add").classList.add("active");
+                chooseOperation('+');
+                break;
+            case '.': //decimal place
+                appendNumber('.');
+                break;
+            case 'Backspace': //backspace behaves like button, will only allClear result 
+                if (computed == true){
+                    clearAll();
+                    return;
+                }
+                deleteLast();
+                break;
+            case '0': //all numbers
+                appendNumber('0');
+                break;
+            case '1':
+                appendNumber('1');
+                break;
+            case '2':
+                appendNumber('2');
+                break;
+            case '3':
+                appendNumber('3');
+                break;
+            case '4':
+                appendNumber('4');
+                break;
+            case '5':
+                appendNumber('5');
+                break;
+            case '6':
+                appendNumber('6');
+                break;
+            case '7':
+                appendNumber('7');
+                break;
+            case '8':
+                appendNumber('8');
+                break;
+            case '9':
+                appendNumber('9');
+                break;
         }
     });
 
