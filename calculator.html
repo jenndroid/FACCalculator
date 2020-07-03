@@ -109,7 +109,29 @@
                 return;
             }
             else if (operation !== undefined){//if I already have an operator, two have been pressed in a row. Special case
+                //turn off all operator button colours
+                const allOps = document.querySelectorAll('.opButton');
+                    allOps.forEach(button => {
+                    button.classList.remove("focus");
+                });
+
                 operation = operator;
+                //turn on new operator button colour
+                switch(operation){
+                    case '÷':
+                        document.getElementById("divide").classList.add("focus");
+                        break;
+                    case 'x':
+                        document.getElementById("multiply").classList.add("focus");
+                        break;
+                    case '+':
+                        document.getElementById("add").classList.add("focus");
+                        break;
+                    case '-':
+                        document.getElementById("subtract").classList.add("focus");
+                        break;
+                }
+                //keep everything else the same and return
                 previousValue = previousValue; 
                 return;       
             } 
@@ -132,21 +154,12 @@
 
     /* compute function */
     function compute(){
-        switch(operation){
-            case '÷':
-                document.getElementById("divide").classList.remove("active");
-                break;
-            case 'x':
-                document.getElementById("multiply").classList.remove("active");
-                break;
-            case '+':
-                document.getElementById("add").classList.remove("active");
-                break;
-            case '-':
-                document.getElementById("subtract").classList.remove("active");
-                break;
-        }
-
+        //turn off focus from any operation button
+        const allOps = document.querySelectorAll('.opButton');
+        allOps.forEach(button => {
+            button.classList.remove("focus");
+        });
+        
         //dividing by 0 produces an error
         if (operation == '÷' && currentValue == '0'){
             currentValue = "undefined";
@@ -238,19 +251,19 @@
                 compute();
                 break;
             case '*': //all operator buttons will light up & call respective operation
-                document.getElementById("multiply").classList.add("active");
+                document.getElementById("multiply").classList.add("focus");
                 chooseOperation('x');
                 break;
             case '/':
-                document.getElementById("divide").classList.add("active");
+                document.getElementById("divide").classList.add("focus");
                 chooseOperation('÷');
                 break;
             case '-':
-                document.getElementById("subtract").classList.add("active");
+                document.getElementById("subtract").classList.add("focus");
                 chooseOperation('-');
                 break;
             case '+':
-                document.getElementById("add").classList.add("active");
+                document.getElementById("add").classList.add("focus");
                 chooseOperation('+');
                 break;
             case '.': //decimal place

@@ -44,10 +44,10 @@
     grid-template-columns: repeat(4, 80px);
 }
 
-.opButton:active{
-    background-color: #edbeca;
+.opButton:focus{
+    background-color: #edbeca; 
 }
-.active{
+.focus{
     background-color: #edbeca;
 }
 
